@@ -6,6 +6,7 @@ let game = {
     canvas: null,
     info: {
         pause: false,
+        pauseTime: false,
         timerStart: null,
         score: 0,
         combo: 1,
@@ -13,6 +14,8 @@ let game = {
         time: 120,
         userName: '',
         modalMode: '',
+        round: 0,
+        roundMap: {},
         scoreInfo: {
             min: 49,
             middle: 199,
@@ -20,6 +23,7 @@ let game = {
     },
     options: {
         fontName: "KulminoituvaRegular",
+        sushiDie: 900,
     },
     ctx: null,
     sprites: {
@@ -51,11 +55,268 @@ let game = {
                 idle: [ path + 'images/background.png' ]
             }
         },
+        sushi: {
+            index: 0,
+            key: 'idle',
+            images: {
+                1: [
+                    path + 'images/sushi/1/Sushi_1.png',
+                    path + 'images/sushi/1/Sushi_1_green.png',
+                    path + 'images/sushi/1/Sushi_1_red.png',
+                ],
+                2: [
+                    path + 'images/sushi/2/Sushi_2.png',
+                    path + 'images/sushi/2/Sushi_2_green.png',
+                    path + 'images/sushi/2/Sushi_2_red.png',
+                ],
+                3: [
+                    path + 'images/sushi/3/Sushi_3.png',
+                    path + 'images/sushi/3/Sushi_3_green.png',
+                    path + 'images/sushi/3/Sushi_3_red.png',
+                ],
+                4: [
+                    path + 'images/sushi/4/Sushi_4.png',
+                    path + 'images/sushi/4/Sushi_4_green.png',
+                    path + 'images/sushi/4/Sushi_4_red.png',
+                ],
+                5: [
+                    path + 'images/sushi/5/Sushi_5.png',
+                    path + 'images/sushi/5/Sushi_5_green.png',
+                    path + 'images/sushi/5/Sushi_5_red.png',
+                ],
+                6: [
+                    path + 'images/sushi/6/Sushi_6.png',
+                    path + 'images/sushi/6/Sushi_6_green.png',
+                    path + 'images/sushi/6/Sushi_6_red.png',
+                ],
+                7: [
+                    path + 'images/sushi/7/Sushi_7.png',
+                    path + 'images/sushi/7/Sushi_7_green.png',
+                    path + 'images/sushi/7/Sushi_7_red.png',
+                ],
+            }
+        },
+        bgPlayer: {
+            index: 0,
+            active: 3,
+            key: 'idle',
+            images: {
+                idle1: [ path + 'images/bg_animation/Background_animation_1/Background_animation_1_1.png' ],
+                animate1: [
+                    path + 'images/bg_animation/Background_animation_1/Background_animation_1_1.png',
+                    path + 'images/bg_animation/Background_animation_1/Background_animation_1_2.png',
+                    path + 'images/bg_animation/Background_animation_1/Background_animation_1_3.png',
+                    path + 'images/bg_animation/Background_animation_1/Background_animation_1_4.png',
+                ],
+                idle2: [ path + 'images/bg_animation/Background_animation_2/Background_animation_1_1.png' ],
+                animate2: [
+                    path + 'images/bg_animation/Background_animation_2/Background_animation_1_1.png',
+                    path + 'images/bg_animation/Background_animation_2/Background_animation_1_2.png',
+                    path + 'images/bg_animation/Background_animation_2/Background_animation_1_3.png',
+                    path + 'images/bg_animation/Background_animation_2/Background_animation_1_4.png',
+                ],
+                idle3: [ path + 'images/bg_animation/Background_animation_3/Background_animation_3_1.png' ],
+                animate3: [
+                    path + 'images/bg_animation/Background_animation_3/Background_animation_3_1.png',
+                    path + 'images/bg_animation/Background_animation_3/Background_animation_3_2.png',
+                    path + 'images/bg_animation/Background_animation_3/Background_animation_3_3.png',
+                    path + 'images/bg_animation/Background_animation_3/Background_animation_3_4.png',
+                ],
+            }
+        },
+        player1: {
+            index: 0,
+            key: 'clap',
+            images: {
+                idle: [
+                    path + 'images/personag/1_player/1_player_1/1_player_1_1.png',
+                    path + 'images/personag/1_player/1_player_1/1_player_1_2.png',
+                    path + 'images/personag/1_player/1_player_1/1_player_1_3.png',
+                    path + 'images/personag/1_player/1_player_1/1_player_1_4.png',
+                    path + 'images/personag/1_player/1_player_1/1_player_1_5.png',
+                    path + 'images/personag/1_player/1_player_1/1_player_1_6.png',
+                ],
+                greatJoy: [
+                    path + 'images/personag/1_player/1_player_2/1_player_2_1.png',
+                    path + 'images/personag/1_player/1_player_2/1_player_2_2.png',
+                    path + 'images/personag/1_player/1_player_2/1_player_2_3.png',
+                    path + 'images/personag/1_player/1_player_2/1_player_2_4.png',
+                    path + 'images/personag/1_player/1_player_2/1_player_2_5.png',
+                    path + 'images/personag/1_player/1_player_2/1_player_2_6.png',
+                ],
+                miss: [
+                    path + 'images/personag/1_player/1_player_3/1_player_3_1.png',
+                    path + 'images/personag/1_player/1_player_3/1_player_3_2.png',
+                    path + 'images/personag/1_player/1_player_3/1_player_3_3.png',
+                    path + 'images/personag/1_player/1_player_3/1_player_3_4.png',
+                    path + 'images/personag/1_player/1_player_3/1_player_3_5.png',
+                    path + 'images/personag/1_player/1_player_3/1_player_3_6.png',
+                ],
+                fear: [
+                    path + 'images/personag/1_player/1_player_4/1_player_4_1.png',
+                    path + 'images/personag/1_player/1_player_4/1_player_4_2.png',
+                    path + 'images/personag/1_player/1_player_4/1_player_4_3.png',
+                    path + 'images/personag/1_player/1_player_4/1_player_4_4.png',
+                    path + 'images/personag/1_player/1_player_4/1_player_4_5.png',
+                    path + 'images/personag/1_player/1_player_4/1_player_4_6.png',
+                ],
+                victory: [
+                    path + 'images/personag/1_player/1_player_5/1_player_5_1.png',
+                    path + 'images/personag/1_player/1_player_5/1_player_5_2.png',
+                    path + 'images/personag/1_player/1_player_5/1_player_5_3.png',
+                    path + 'images/personag/1_player/1_player_5/1_player_5_4.png',
+                    path + 'images/personag/1_player/1_player_5/1_player_5_5.png',
+                    path + 'images/personag/1_player/1_player_5/1_player_5_6.png',
+                ],
+                upset: [
+                    path + 'images/personag/1_player/1_player_6/1_player_6_1.png',
+                    path + 'images/personag/1_player/1_player_6/1_player_6_2.png',
+                    path + 'images/personag/1_player/1_player_6/1_player_6_3.png',
+                    path + 'images/personag/1_player/1_player_6/1_player_6_4.png',
+                    path + 'images/personag/1_player/1_player_6/1_player_6_5.png',
+                    path + 'images/personag/1_player/1_player_6/1_player_6_6.png',
+                ],
+                clap: [
+                    path + 'images/personag/1_player/1_player_clap/1_player_clap_1.png',
+                    path + 'images/personag/1_player/1_player_clap/1_player_clap_2.png',
+                    path + 'images/personag/1_player/1_player_clap/1_player_clap_3.png',
+                    path + 'images/personag/1_player/1_player_clap/1_player_clap_4.png',
+                    path + 'images/personag/1_player/1_player_clap/1_player_clap_5.png',
+                    path + 'images/personag/1_player/1_player_clap/1_player_clap_6.png',
+                ],
+            }
+        },
+        player2: {
+            index: 0,
+            key: 'idle',
+            images: {
+                idle: [
+                    path + 'images/personag/2_player/2_player_1/2_player_1_1.png',
+                    path + 'images/personag/2_player/2_player_1/2_player_1_2.png',
+                    path + 'images/personag/2_player/2_player_1/2_player_1_3.png',
+                    path + 'images/personag/2_player/2_player_1/2_player_1_4.png',
+                    path + 'images/personag/2_player/2_player_1/2_player_1_5.png',
+                    path + 'images/personag/2_player/2_player_1/2_player_1_6.png',
+                ],
+                greatJoy: [
+                    path + 'images/personag/2_player/2_player_2/2_player_2_1.png',
+                    path + 'images/personag/2_player/2_player_2/2_player_2_2.png',
+                    path + 'images/personag/2_player/2_player_2/2_player_2_3.png',
+                    path + 'images/personag/2_player/2_player_2/2_player_2_4.png',
+                    path + 'images/personag/2_player/2_player_2/2_player_2_5.png',
+                    path + 'images/personag/2_player/2_player_2/2_player_2_6.png',
+                ],
+                miss: [
+                    path + 'images/personag/2_player/2_player_3/2_player_3_1.png',
+                    path + 'images/personag/2_player/2_player_3/2_player_3_2.png',
+                    path + 'images/personag/2_player/2_player_3/2_player_3_3.png',
+                    path + 'images/personag/2_player/2_player_3/2_player_3_4.png',
+                    path + 'images/personag/2_player/2_player_3/2_player_3_5.png',
+                    path + 'images/personag/2_player/2_player_3/2_player_3_6.png',
+                ],
+                fear: [
+                    path + 'images/personag/2_player/2_player_4/2_player_4_1.png',
+                    path + 'images/personag/2_player/2_player_4/2_player_4_2.png',
+                    path + 'images/personag/2_player/2_player_4/2_player_4_3.png',
+                    path + 'images/personag/2_player/2_player_4/2_player_4_4.png',
+                    path + 'images/personag/2_player/2_player_4/2_player_4_5.png',
+                    path + 'images/personag/2_player/2_player_4/2_player_4_6.png',
+                ],
+                victory: [
+                    path + 'images/personag/2_player/2_player_5/2_player_5_1.png',
+                    path + 'images/personag/2_player/2_player_5/2_player_5_2.png',
+                    path + 'images/personag/2_player/2_player_5/2_player_5_3.png',
+                    path + 'images/personag/2_player/2_player_5/2_player_5_4.png',
+                    path + 'images/personag/2_player/2_player_5/2_player_5_5.png',
+                    path + 'images/personag/2_player/2_player_5/2_player_5_6.png',
+                ],
+                upset: [
+                    path + 'images/personag/2_player/2_player_6/2_player_6_1.png',
+                    path + 'images/personag/2_player/2_player_6/2_player_6_2.png',
+                    path + 'images/personag/2_player/2_player_6/2_player_6_3.png',
+                    path + 'images/personag/2_player/2_player_6/2_player_6_4.png',
+                    path + 'images/personag/2_player/2_player_6/2_player_6_5.png',
+                    path + 'images/personag/2_player/2_player_6/2_player_6_6.png',
+                ],
+                clap: [
+                    path + 'images/personag/2_player/2_player_clap/2_player_clap_1.png',
+                    path + 'images/personag/2_player/2_player_clap/2_player_clap_2.png',
+                    path + 'images/personag/2_player/2_player_clap/2_player_clap_3.png',
+                    path + 'images/personag/2_player/2_player_clap/2_player_clap_4.png',
+                    path + 'images/personag/2_player/2_player_clap/2_player_clap_5.png',
+                    path + 'images/personag/2_player/2_player_clap/2_player_clap_6.png',
+                ],
+            }
+        },
+        player3: {
+            index: 0,
+            key: 'idle',
+            images: {
+                idle: [
+                    path + 'images/personag/3_player/3_player_1/3_player_1_1.png',
+                    path + 'images/personag/3_player/3_player_1/3_player_1_2.png',
+                    path + 'images/personag/3_player/3_player_1/3_player_1_3.png',
+                    path + 'images/personag/3_player/3_player_1/3_player_1_4.png',
+                    path + 'images/personag/3_player/3_player_1/3_player_1_5.png',
+                    path + 'images/personag/3_player/3_player_1/3_player_1_6.png',
+                ],
+                greatJoy: [
+                    path + 'images/personag/3_player/3_player_2/3_player_2_1.png',
+                    path + 'images/personag/3_player/3_player_2/3_player_2_2.png',
+                    path + 'images/personag/3_player/3_player_2/3_player_2_3.png',
+                    path + 'images/personag/3_player/3_player_2/3_player_2_4.png',
+                    path + 'images/personag/3_player/3_player_2/3_player_2_5.png',
+                    path + 'images/personag/3_player/3_player_2/3_player_2_6.png',
+                ],
+                miss: [
+                    path + 'images/personag/3_player/3_player_3/3_player_3_1.png',
+                    path + 'images/personag/3_player/3_player_3/3_player_3_2.png',
+                    path + 'images/personag/3_player/3_player_3/3_player_3_3.png',
+                    path + 'images/personag/3_player/3_player_3/3_player_3_4.png',
+                    path + 'images/personag/3_player/3_player_3/3_player_3_5.png',
+                    path + 'images/personag/3_player/3_player_3/3_player_3_6.png',
+                ],
+                fear: [
+                    path + 'images/personag/3_player/3_player_4/3_player_4_1.png',
+                    path + 'images/personag/3_player/3_player_4/3_player_4_2.png',
+                    path + 'images/personag/3_player/3_player_4/3_player_4_3.png',
+                    path + 'images/personag/3_player/3_player_4/3_player_4_4.png',
+                    path + 'images/personag/3_player/3_player_4/3_player_4_5.png',
+                    path + 'images/personag/3_player/3_player_4/3_player_4_6.png',
+                ],
+                victory: [
+                    path + 'images/personag/3_player/3_player_5/3_player_5_1.png',
+                    path + 'images/personag/3_player/3_player_5/3_player_5_2.png',
+                    path + 'images/personag/3_player/3_player_5/3_player_5_3.png',
+                    path + 'images/personag/3_player/3_player_5/3_player_5_4.png',
+                    path + 'images/personag/3_player/3_player_5/3_player_5_5.png',
+                    path + 'images/personag/3_player/3_player_5/3_player_5_6.png',
+                ],
+                upset: [
+                    path + 'images/personag/3_player/3_player_6/3_player_6_1.png',
+                    path + 'images/personag/3_player/3_player_6/3_player_6_2.png',
+                    path + 'images/personag/3_player/3_player_6/3_player_6_3.png',
+                    path + 'images/personag/3_player/3_player_6/3_player_6_4.png',
+                    path + 'images/personag/3_player/3_player_6/3_player_6_5.png',
+                    path + 'images/personag/3_player/3_player_6/3_player_6_6.png',
+                ],
+                clap: [
+                    path + 'images/personag/3_player/3_player_clap/3_player_clap_1.png',
+                    path + 'images/personag/3_player/3_player_clap/3_player_clap_2.png',
+                    path + 'images/personag/3_player/3_player_clap/3_player_clap_3.png',
+                    path + 'images/personag/3_player/3_player_clap/3_player_clap_4.png',
+                    path + 'images/personag/3_player/3_player_clap/3_player_clap_5.png',
+                    path + 'images/personag/3_player/3_player_clap/3_player_clap_6.png',
+                ],
+            }
+        },
         bgTanuki: {
             index: 0,
             key: 'idle',
             images: {
-                idle: [ path + 'images/bg_animation/Background_animation_tanuki/Background_animation_tanuki_1.png' ],
+                idle: [ 
+                    path + 'images/bg_animation/Background_animation_tanuki/Background_animation_tanuki_1.png'
+                ],
                 animate: [
                     path + 'images/bg_animation/Background_animation_tanuki/Background_animation_tanuki_1.png',
                     path + 'images/bg_animation/Background_animation_tanuki/Background_animation_tanuki_2.png',
@@ -116,12 +377,16 @@ let game = {
     animationOn: {
         tanuki: true,
         bgTanuki: true,
+        player1: true,
+        player2: true,
+        player3: true,
     },
     create() {
         const userName = document.querySelector('[data-user-name]');
         if(userName) {
             this.userName = userName.dataset.userName;
         }
+        this.startGame();
     },
     start() {
         for(const i in this.helper) {
@@ -169,6 +434,12 @@ let game = {
         const btnEvent = sprites.btnEvent.loadImg[sprites.btnEvent.key][sprites.btnEvent.index];
         const tanuki = sprites.tanuki.loadImg[sprites.tanuki.key][sprites.tanuki.index];
         const ligth = sprites.ligth.loadImg[sprites.ligth.key][sprites.ligth.index];
+        const bgPlayer = sprites.bgPlayer.loadImg["".concat(sprites.bgPlayer.key, sprites.bgPlayer.active)][sprites.bgPlayer.index];
+        
+        const playerKey = "player".concat(sprites.bgPlayer.active);
+        const player = sprites[playerKey].loadImg[sprites[playerKey].key][sprites[playerKey].index];
+
+        
 
         this.ctx.drawImage(background, 0, 0, 1920, 1080);
         this.ctx.drawImage(tanukiBg, -72, 440, 800, 650);
@@ -185,6 +456,18 @@ let game = {
 
         this.ctx.drawImage(btnEvent, 1280, 700, 640, 290);
         this.ctx.drawImage(tanuki, 70, 525, 500, 500);
+
+        this.ctx.drawImage(bgPlayer, 1200, 0, 800, 650);
+        this.ctx.drawImage(player, 1350, 83, 500, 500);
+
+        const round = this.info.round;
+        for(const line of this.info.roundMap[round]) {
+            if(!line.changeTanuki) {
+                const sushi = sprites.sushi.loadImg[line.key][0];
+                this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
+            }
+        }
+
 
         if(this.info.modalMode && false) {
             this.ctx.drawImage(sprites.modal.loadImg['idle'][0], 0, 0);
@@ -283,7 +566,7 @@ game.initEvent = function () {
         }
     }
     setInterval(() => {
-        if(this.info.pause) return false;
+        if(this.info.pause || this.info.pauseTime) return false;
         this.info.time--;
         if(this.info.time === 0) {
             this.gameOver();
@@ -294,6 +577,9 @@ game.animation = function () {
     const animationMass = [
         { key: 'tanuki', time: 100 },
         { key: 'bgTanuki', time: 100 },
+        { key: 'player1', time: 100 },
+        { key: 'player2', time: 100 },
+        { key: 'player3', time: 100 },
     ];
     for (const animation of animationMass) {
         setInterval(() => {
@@ -309,6 +595,43 @@ game.animation = function () {
     }
 };
 game.helper = {
+    generateLevel() {
+        this.info.pauseTime = true;
+        const round = this.info.round;
+        
+        let countSushi = this.info.time < (120 / 2) ? 7 : 5;
+        const maxSushi = countSushi;
+
+        if(!this.info.roundMap[round]) {
+            this.info.roundMap[round] = [];
+            let y = -30;
+            while (countSushi) {
+                const key = Math.floor(Math.random() * (Math.floor(maxSushi) - Math.ceil(1)) + Math.ceil(1));
+                this.info.roundMap[round].push({ x: 850, y, yTanuki: y, changeTanuki: false, change: false, key });
+                y -= 150;
+                y -= (30 * key);
+                countSushi--;
+            }
+        }
+
+        const tanukiTime = setInterval(() => {
+            for(const line of this.info.roundMap[round]) {
+                line.y += 3;
+                if(line.y > this.options.sushiDie && !line.changeTanuki) {
+                    line.changeTanuki = true;
+                    console.log('kill sushi');
+                    this.sprites.tanuki.index = 0;
+                    this.sprites.tanuki.key = 'clap';
+                    setTimeout(() => {
+                        this.sprites.tanuki.index = 0;
+                        this.sprites.tanuki.key = 'idle';
+                    }, 200);
+                }
+            }
+        }, 10);
+
+        console.log(this.info.roundMap);
+    },
     drawText(text, postion = [0, 0], size = 24, color = "#000") {
         this.ctx.fillStyle = color;
         this.ctx.font = "".concat(size, "px ", this.options.fontName);
@@ -333,7 +656,9 @@ game.helper = {
 
     },
     formateScore: (score) => score > 9999 ? score : ('0'.repeat(4 - `${score}`.length)).concat(score),
-    startGame() { },
+    startGame() { 
+        this.generateLevel();
+    },
     startTimer(callback = null) {
         this.sprites.timer.index = 0;
         this.info.modalMode = 'countdown';
