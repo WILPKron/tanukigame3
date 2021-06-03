@@ -5,7 +5,10 @@ let game = {
     height: 1080,
     canvas: null,
     info: {
+        activePlayer: 'tanuki',
         pause: false,
+        speed: 4,
+        miumiu: null,
         pauseTime: false,
         timerStart: null,
         score: 0,
@@ -23,12 +26,29 @@ let game = {
     },
     options: {
         fontName: "KulminoituvaRegular",
-        sushiDie: 900,
+        sushiLine: 900,
+        sushiDie: 1050,
     },
     ctx: null,
     sprites: {
+        infoBlock: {
+            index: 0,
+            key: 'idle',
+            show: false,
+            images: {
+                idle: [
+                    path + 'images/Bubble_1.png',
+                    path + 'images/Bubble_2.png',
+                ]
+            } 
+        },
         ligth: {
             index: 0,
+            alpha: {
+                value: 0,
+                max: 1,
+                min: 0.2,
+            },
             key: 'idle',
             images: {
                 idle: [ path + 'images/light_1.png' ]
@@ -126,9 +146,9 @@ let game = {
         },
         player1: {
             index: 0,
-            key: 'clap',
+            key: 'idle',
             images: {
-                idle: [
+                clap: [
                     path + 'images/personag/1_player/1_player_1/1_player_1_1.png',
                     path + 'images/personag/1_player/1_player_1/1_player_1_2.png',
                     path + 'images/personag/1_player/1_player_1/1_player_1_3.png',
@@ -176,7 +196,7 @@ let game = {
                     path + 'images/personag/1_player/1_player_6/1_player_6_5.png',
                     path + 'images/personag/1_player/1_player_6/1_player_6_6.png',
                 ],
-                clap: [
+                idle: [
                     path + 'images/personag/1_player/1_player_clap/1_player_clap_1.png',
                     path + 'images/personag/1_player/1_player_clap/1_player_clap_2.png',
                     path + 'images/personag/1_player/1_player_clap/1_player_clap_3.png',
@@ -190,7 +210,7 @@ let game = {
             index: 0,
             key: 'idle',
             images: {
-                idle: [
+                clap: [
                     path + 'images/personag/2_player/2_player_1/2_player_1_1.png',
                     path + 'images/personag/2_player/2_player_1/2_player_1_2.png',
                     path + 'images/personag/2_player/2_player_1/2_player_1_3.png',
@@ -238,7 +258,7 @@ let game = {
                     path + 'images/personag/2_player/2_player_6/2_player_6_5.png',
                     path + 'images/personag/2_player/2_player_6/2_player_6_6.png',
                 ],
-                clap: [
+                idle: [
                     path + 'images/personag/2_player/2_player_clap/2_player_clap_1.png',
                     path + 'images/personag/2_player/2_player_clap/2_player_clap_2.png',
                     path + 'images/personag/2_player/2_player_clap/2_player_clap_3.png',
@@ -252,7 +272,7 @@ let game = {
             index: 0,
             key: 'idle',
             images: {
-                idle: [
+                clap: [
                     path + 'images/personag/3_player/3_player_1/3_player_1_1.png',
                     path + 'images/personag/3_player/3_player_1/3_player_1_2.png',
                     path + 'images/personag/3_player/3_player_1/3_player_1_3.png',
@@ -300,7 +320,7 @@ let game = {
                     path + 'images/personag/3_player/3_player_6/3_player_6_5.png',
                     path + 'images/personag/3_player/3_player_6/3_player_6_6.png',
                 ],
-                clap: [
+                idle: [
                     path + 'images/personag/3_player/3_player_clap/3_player_clap_1.png',
                     path + 'images/personag/3_player/3_player_clap/3_player_clap_2.png',
                     path + 'images/personag/3_player/3_player_clap/3_player_clap_3.png',
@@ -329,7 +349,7 @@ let game = {
             index: 0,
             key: 'idle',
             images: {
-                idle: [
+                clap: [
                     path + 'images/personag/Tanuki/Tanuki_1/tanuki_1_1.png', 
                     path + 'images/personag/Tanuki/Tanuki_1/tanuki_1_2.png', 
                     path + 'images/personag/Tanuki/Tanuki_1/tanuki_1_3.png', 
@@ -337,11 +357,53 @@ let game = {
                     path + 'images/personag/Tanuki/Tanuki_1/tanuki_1_5.png', 
                     path + 'images/personag/Tanuki/Tanuki_1/tanuki_1_6.png', 
                 ],
-                clap: [
-                    //path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_1.png',
-                    //path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_2.png',
+
+                greatJoy: [
+                    path + 'images/personag/Tanuki/Tanuki_2/tanuki_2_1.png',
+                    path + 'images/personag/Tanuki/Tanuki_2/tanuki_2_2.png',
+                    path + 'images/personag/Tanuki/Tanuki_2/tanuki_2_3.png',
+                    path + 'images/personag/Tanuki/Tanuki_2/tanuki_2_4.png',
+                    path + 'images/personag/Tanuki/Tanuki_2/tanuki_2_5.png',
+                    path + 'images/personag/Tanuki/Tanuki_2/tanuki_2_6.png',
+                ],
+                miss: [
+                    path + 'images/personag/Tanuki/Tanuki_3/tanuki_3_1.png',
+                    path + 'images/personag/Tanuki/Tanuki_3/tanuki_3_2.png',
+                    path + 'images/personag/Tanuki/Tanuki_3/tanuki_3_3.png',
+                    path + 'images/personag/Tanuki/Tanuki_3/tanuki_3_4.png',
+                    path + 'images/personag/Tanuki/Tanuki_3/tanuki_3_5.png',
+                    path + 'images/personag/Tanuki/Tanuki_3/tanuki_3_6.png',
+                ],
+                fear: [
+                    path + 'images/personag/Tanuki/Tanuki_4/tanuki_4_1.png',
+                    path + 'images/personag/Tanuki/Tanuki_4/tanuki_4_2.png',
+                    path + 'images/personag/Tanuki/Tanuki_4/tanuki_4_3.png',
+                    path + 'images/personag/Tanuki/Tanuki_4/tanuki_4_4.png',
+                    path + 'images/personag/Tanuki/Tanuki_4/tanuki_4_5.png',
+                    path + 'images/personag/Tanuki/Tanuki_4/tanuki_4_6.png',
+                ],
+                victory: [
+                    path + 'images/personag/Tanuki/Tanuki_5/tanuki_5_1.png',
+                    path + 'images/personag/Tanuki/Tanuki_5/tanuki_5_2.png',
+                    path + 'images/personag/Tanuki/Tanuki_5/tanuki_5_3.png',
+                    path + 'images/personag/Tanuki/Tanuki_5/tanuki_5_4.png',
+                    path + 'images/personag/Tanuki/Tanuki_5/tanuki_5_5.png',
+                    path + 'images/personag/Tanuki/Tanuki_5/tanuki_5_6.png',
+                ],
+                upset: [
+                    path + 'images/personag/Tanuki/Tanuki_6/tanuki_6_1.png',
+                    path + 'images/personag/Tanuki/Tanuki_6/tanuki_6_2.png',
+                    path + 'images/personag/Tanuki/Tanuki_6/tanuki_6_3.png',
+                    path + 'images/personag/Tanuki/Tanuki_6/tanuki_6_4.png',
+                    path + 'images/personag/Tanuki/Tanuki_6/tanuki_6_5.png',
+                    path + 'images/personag/Tanuki/Tanuki_6/tanuki_6_6.png',
+                ],
+
+                idle: [
+                    path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_1.png',
+                    path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_2.png',
                     path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_3.png',
-                    //path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_4.png',
+                    path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_4.png',
                     path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_5.png',
                     path + 'images/personag/Tanuki/Tanuki_clap/tanuki_clap_6.png',
                 ],
@@ -352,6 +414,7 @@ let game = {
             key: 'idle',
             images: {
                 idle: [
+                    path + 'images/bg.png',
                     path + 'images/block/ui/Tanuki_2.png',
                     path + 'images/block/ui/yes.png',
                     path + 'images/block/ui/Tanuki_score_2.png',
@@ -377,6 +440,7 @@ let game = {
     animationOn: {
         tanuki: true,
         bgTanuki: true,
+        bgPlayer: true,
         player1: true,
         player2: true,
         player3: true,
@@ -434,6 +498,7 @@ let game = {
         const btnEvent = sprites.btnEvent.loadImg[sprites.btnEvent.key][sprites.btnEvent.index];
         const tanuki = sprites.tanuki.loadImg[sprites.tanuki.key][sprites.tanuki.index];
         const ligth = sprites.ligth.loadImg[sprites.ligth.key][sprites.ligth.index];
+        const infoBlock = sprites.infoBlock.loadImg[sprites.infoBlock.key][sprites.infoBlock.index];
         const bgPlayer = sprites.bgPlayer.loadImg["".concat(sprites.bgPlayer.key, sprites.bgPlayer.active)][sprites.bgPlayer.index];
         
         const playerKey = "player".concat(sprites.bgPlayer.active);
@@ -443,7 +508,11 @@ let game = {
 
         this.ctx.drawImage(background, 0, 0, 1920, 1080);
         this.ctx.drawImage(tanukiBg, -72, 440, 800, 650);
+
+        this.ctx.globalAlpha = sprites.ligth.alpha.value;
         this.ctx.drawImage(ligth, 735, 700, 430, 400);
+        this.ctx.globalAlpha = 1;
+
         this.ctx.drawImage(triangle, 745, 680, 400, 400);
 
         this.drawText(this.gameTime(), [320, 185], 124, "#E63222");
@@ -460,19 +529,30 @@ let game = {
         this.ctx.drawImage(bgPlayer, 1200, 0, 800, 650);
         this.ctx.drawImage(player, 1350, 83, 500, 500);
 
+        
         const round = this.info.round;
+        
         for(const line of this.info.roundMap[round]) {
-            if(!line.changeTanuki) {
-                const sushi = sprites.sushi.loadImg[line.key][0];
-                this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
+            const sushi = sprites.sushi.loadImg[line.key][0];
+            if(this.info.activePlayer === 'tanuki') {
+                if(!line.changeTanuki) {
+                    this.ctx.drawImage(sushi, line.x, line.yTanuki, 200, 150);
+                }
+            } else {
+                if(!line.change && !line.die) {
+                    this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
+                }
             }
         }
 
+        if(sprites.infoBlock.show) {
+            this.ctx.drawImage(infoBlock, 620, 150, 700, 700);
+        }
 
-        if(this.info.modalMode && false) {
+        if(this.info.modalMode) {
             this.ctx.drawImage(sprites.modal.loadImg['idle'][0], 0, 0);
-            this.ctx.drawImage(row2, 0, 0, 1280, 720, 640 - r1x, 360 - r1y, 1280 + r1x, 720 + r1y);
-            this.ctx.drawImage(row1, 0, 0, 1280, 720, 640 - r1x, 360 - r1y, 1280 + r1x, 720 + r1y);
+            //this.ctx.drawImage(row2, 0, 0, 1280, 720, 640 - r1x, 360 - r1y, 1280 + r1x, 720 + r1y);
+            //this.ctx.drawImage(row1, 0, 0, 1280, 720, 640 - r1x, 360 - r1y, 1280 + r1x, 720 + r1y);
             this.ctx.fillStyle = "#fff";
             switch(this.info.modalMode) {
                 case "start":
@@ -560,6 +640,38 @@ let game = {
     }
 };
 game.initEvent = function () {
+    this.eventButton({
+        event: {
+            hover() {
+                if(this.info.activePlayer !== 'tanuki') {
+                    this.canvas.style.cursor = 'pointer';
+                }
+            },
+            afterHover() {
+                this.canvas.style.cursor = '';
+            },
+            click() {
+                if(this.info.activePlayer === 'tanuki') {
+                    return false;
+                }
+                const round = this.info.round;
+                const list = this.info.roundMap[round].filter( item => item.die === false && item.change === false );
+                
+                if(list.length) {
+                    const line = list[0];
+                    if(line.y > this.options.sushiLine && line.y < this.options.sushiDie) {
+                        line.change = true;
+                        this.addScore(1);
+                        this.emotion(this.actualPlayer(), 'clap', {
+                            action: () => this.flash(),
+                            end: () => this.emotion(this.actualPlayer(), 'greatJoy', null, 600)
+                        });
+                    }
+                }
+            }
+        }
+
+    }, 1280, 700, 640, 290);
     document.body.onkeydown = (e) => {
         if(e.keyCode == 32) {
             //change(e);
@@ -577,6 +689,7 @@ game.animation = function () {
     const animationMass = [
         { key: 'tanuki', time: 100 },
         { key: 'bgTanuki', time: 100 },
+        { key: 'bgPlayer', time: 100 },
         { key: 'player1', time: 100 },
         { key: 'player2', time: 100 },
         { key: 'player3', time: 100 },
@@ -585,7 +698,7 @@ game.animation = function () {
         setInterval(() => {
             if(this.info.pause) return false;
             const field = this.sprites[animation.key];
-            if(this.animationOn[animation.key]) {
+            if(this.animationOn[animation.key] && field.images[field.key]) {
                 field.index++;
                 if(field.index == field.images[field.key].length) {
                     field.index = 0;
@@ -595,42 +708,143 @@ game.animation = function () {
     }
 };
 game.helper = {
+    actualPlayer() {
+        return "player".concat(this.sprites.bgPlayer.active);
+    },
+    flash() {
+        if(this.info.miumiu) clearInterval(this.info.miumiu);
+        this.info.miumiu = null;
+        this.sprites.ligth.alpha.value = this.sprites.ligth.alpha.min;
+        let countMiumiu = 0;
+        this.info.miumiu = setInterval(() => {
+            this.sprites.ligth.alpha.value += 0.3;
+            if(this.sprites.ligth.alpha.value >= this.sprites.ligth.alpha.max) {
+                this.sprites.ligth.alpha.value = this.sprites.ligth.alpha.min;
+                countMiumiu++;
+            }
+            if(countMiumiu == 5 && this.info.miumiu) {
+                clearInterval(this.info.miumiu);
+                this.sprites.ligth.alpha.value = 0;
+            }
+        }, 100);
+    },
     generateLevel() {
         this.info.pauseTime = true;
         const round = this.info.round;
         
-        let countSushi = this.info.time < (120 / 2) ? 7 : 5;
-        const maxSushi = countSushi;
-
+        let countSushi = this.info.time < (120 / 2) ? 10 : 5;
         if(!this.info.roundMap[round]) {
             this.info.roundMap[round] = [];
             let y = -30;
             while (countSushi) {
-                const key = Math.floor(Math.random() * (Math.floor(maxSushi) - Math.ceil(1)) + Math.ceil(1));
-                this.info.roundMap[round].push({ x: 850, y, yTanuki: y, changeTanuki: false, change: false, key });
+                const key = Math.floor(Math.random() * (Math.floor(Object.values(this.sprites.sushi.images).length) - Math.ceil(1)) + Math.ceil(1));
+                this.info.roundMap[round].push({ 
+                    x: 850,
+                    y,
+                    yTanuki: y,
+                    changeTanuki: false,
+                    change: false,
+                    die: false,
+                    key,
+                    default: {
+                        y,
+                        changeTanuki: false,
+                        change: false,
+                        die: false,
+                    }
+                });
+
                 y -= 150;
                 y -= (30 * key);
                 countSushi--;
             }
         }
-
-        const tanukiTime = setInterval(() => {
-            for(const line of this.info.roundMap[round]) {
-                line.y += 3;
-                if(line.y > this.options.sushiDie && !line.changeTanuki) {
-                    line.changeTanuki = true;
-                    console.log('kill sushi');
-                    this.sprites.tanuki.index = 0;
-                    this.sprites.tanuki.key = 'clap';
-                    setTimeout(() => {
-                        this.sprites.tanuki.index = 0;
-                        this.sprites.tanuki.key = 'idle';
-                    }, 200);
+        this.tanukiStart();
+    },
+    tanukiStart() {
+        const round = this.info.round;
+        this.info.activePlayer = 'tanuki';
+        this.sprites.infoBlock.index = 0;
+        this.sprites.infoBlock.show = true;
+        this.sprites.bgTanuki.key = 'animate';
+        setTimeout(() => {
+            this.sprites.infoBlock.show = false;
+            const tanukiTime = setInterval(() => {
+                for(const line of this.info.roundMap[round]) {
+                    line.yTanuki += this.info.speed;
+                    if(line.yTanuki > this.options.sushiLine && !line.changeTanuki) {
+                        line.changeTanuki = true;
+                        this.emotion('tanuki', 'clap', {
+                            action: () => this.flash(),
+                        }, 600);
+                    }
                 }
-            }
-        }, 10);
+                if(this.info.roundMap[round].every(item => item.changeTanuki)) {
+                    this.sprites.bgTanuki.index = 0;
+                    this.sprites.bgTanuki.key = 'idle';
+                    clearInterval(tanukiTime);
+                    this.palayerStart();
+                }
+            }, 10);
+        }, 2000);
+    },
+    palayerStart() {
+        this.info.activePlayer = 'player';
+        this.sprites.infoBlock.index = 1;
+        this.sprites.infoBlock.show = true;
+        this.sprites.bgPlayer.key = 'animate';
+        const round = this.info.round;
+        setTimeout(() => {
+            this.sprites.infoBlock.show = false;
+            this.info.pauseTime = false;
+            const tanukiTime = setInterval(() => {
+                for(const line of this.info.roundMap[round]) {
+                    line.y += this.info.speed;
+                    if(line.y > this.options.sushiDie && !line.die && !line.change) {
+                        this.emotion(this.actualPlayer(), 'miss', null, 600);
+                        line.die = true;
+                    }
+                }
+                if(this.info.roundMap[round].every(item => item.change || item.die)) {
+                    if(this.info.roundMap[round].every(item => item.change)) {
+                        this.addScore(this.info.roundMap[round].length);
+                        this.addScore(10 * (this.info.combo - 1));
+                        this.addCombo();
+                        this.emotion(this.actualPlayer(), 'greatJoy', null, 1000);
+                    } else if(
+                        (this.info.roundMap[round].length / 2) > 
+                        this.info.roundMap[round].filter(item => item.change).length
+                    ) {
+                        this.emotion(this.actualPlayer(), 'fear', null, 1000);
+                    }
+                    
+                    this.info.speed += 0.1;
 
-        console.log(this.info.roundMap);
+                    //setCombo
+
+                    clearInterval(tanukiTime);
+                    this.info.round++;
+                    this.sprites.bgPlayer.index = 0;
+                    this.sprites.bgPlayer.key = 'idle';
+                    this.generateLevel();
+                }
+            }, 10);
+        }, 2000);
+
+    },
+    emotion(personag = 'tanuki', animation = 'clap', event = null, time = 200) {
+        this.sprites[personag].index = 0;
+        this.sprites[personag].key = animation;
+        if(event && event.action) event.action.apply(this);
+        if(this.sprites[personag].animat) {
+            clearTimeout(this.sprites[personag].animat);
+        }
+        this.sprites[personag].animat = setTimeout(() => {
+            this.sprites[personag].index = 0;
+            this.sprites[personag].key = 'idle';
+            console.log(personag, 'idle');
+            if(event && event.end) event.end.apply(this);
+        }, time);
     },
     drawText(text, postion = [0, 0], size = 24, color = "#000") {
         this.ctx.fillStyle = color;
