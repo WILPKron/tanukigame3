@@ -1,4 +1,4 @@
-const path = window.location.host === "tanukichampion.ru" ? "/assets/game2/" : "";
+const path = window.location.host === "tanukichampion.ru" ? "/assets/game3/" : "";
 let game = {
     statusGame: undefined,
     width: 1920,
@@ -643,9 +643,9 @@ game.initEvent = function () {
     this.eventButton({
         event: {
             hover() {
-                if(this.info.activePlayer !== 'tanuki') {
+                //if(this.info.activePlayer !== 'tanuki') {
                     this.canvas.style.cursor = 'pointer';
-                }
+                //}
             },
             afterHover() {
                 this.canvas.style.cursor = '';
@@ -659,7 +659,8 @@ game.initEvent = function () {
                 
                 if(list.length) {
                     const line = list[0];
-                    if(line.y > this.options.sushiLine && line.y < this.options.sushiDie) {
+                    // console.log(line.y, ' > ', this.options.sushiLine, " && ", line.y, " < ", this.options.sushiDie, " = ", line.y > this.options.sushiLine && line.y < this.options.sushiDie);
+                    if(line.y > this.options.sushiLine - 50 && line.y < this.options.sushiDie) {
                         line.change = true;
                         this.addScore(1);
                         this.emotion(this.actualPlayer(), 'clap', {
@@ -820,6 +821,7 @@ game.helper = {
                         this.info.roundMap[round].filter(item => item.change).length
                     ) {
                         this.emotion(this.actualPlayer(), 'fear', null, 1000);
+                        this.setCombo(1);
                     }
                     
                     this.info.speed += 0.1;
