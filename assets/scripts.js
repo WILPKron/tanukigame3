@@ -687,20 +687,24 @@ game.initEvent = function () {
 };
 game.animation = function () {
     const animationMass = [
-        { key: 'tanuki', time: 100 },
-        { key: 'bgTanuki', time: 100 },
-        { key: 'bgPlayer', time: 100 },
-        { key: 'player1', time: 100 },
-        { key: 'player2', time: 100 },
-        { key: 'player3', time: 100 },
+        { key: 'tanuki',    time: 100 },
+        { key: 'bgTanuki',  time: 100 },
+        { key: 'bgPlayer',  time: 100 },
+        { key: 'player1',   time: 100 },
+        { key: 'player2',   time: 100 },
+        { key: 'player3',   time: 100 },
     ];
     for (const animation of animationMass) {
         setInterval(() => {
             if(this.info.pause) return false;
             const field = this.sprites[animation.key];
-            if(this.animationOn[animation.key] && field.images[field.key]) {
+            let key = field.key;
+            if(animation.key == 'bgPlayer') {
+                key += this.sprites.bgPlayer.active; 
+            }
+            if(this.animationOn[animation.key] && field.images[key]) {
                 field.index++;
-                if(field.index == field.images[field.key].length) {
+                if(field.index >= field.images[key].length) {
                     field.index = 0;
                 }
             } else field.index = 0;
