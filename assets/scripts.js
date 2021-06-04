@@ -26,8 +26,8 @@ let game = {
     },
     options: {
         fontName: "KulminoituvaRegular",
-        sushiLine: 900,
-        sushiDie: 1050,
+        sushiLine: 800,
+        sushiDie: 950,
     },
     ctx: null,
     sprites: {
@@ -519,7 +519,7 @@ let game = {
         this.ctx.drawImage(ligth, 735, 700, 430, 400);
         this.ctx.globalAlpha = 1;
 
-        this.ctx.drawImage(triangle, 745, 680, 400, 400);
+        
 
         this.drawText(this.gameTime(), [320, 185], 124, "#E63222");
 
@@ -542,22 +542,21 @@ let game = {
             for(const line of this.info.roundMap[round]) {
                 let sushi = sprites.sushi.loadImg[line.key][0];
                 if(this.info.activePlayer === 'tanuki') {
-                    if(line.touch) {
+                    if(line.changeTanuki && line.touch) {
                         sushi = sprites.sushi.loadImg[line.key][1];
-                    } else {
+                    }
+                    this.ctx.drawImage(sushi, line.x, line.yTanuki, 200, 150);
+                } else {
+                    if(line.change && line.touch) {
+                        sushi = sprites.sushi.loadImg[line.key][1];
+                    } else if(line.change && !line.touch) {
                         sushi = sprites.sushi.loadImg[line.key][2];
                     }
-                    if(!line.changeTanuki) {
-                        this.ctx.drawImage(sushi, line.x, line.yTanuki, 200, 150);
-                    }
-                } else {
-                    if(!line.change && !line.die) {
-                        this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
-                    }
+                    this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
                 }
             }
         }
-
+        this.ctx.drawImage(triangle, 745, 680, 400, 400);
 
         if(sprites.infoBlock.show) {
             this.ctx.drawImage(infoBlock, 620, 150, 700, 700);
@@ -565,7 +564,7 @@ let game = {
 
         if(this.info.modalMode) {
 
-            this.ctx.globalAlpha = 0.4;
+            this.ctx.globalAlpha = 0.8;
             this.ctx.fillStyle = "#181836";
             this.ctx.fillRect(0, 0, 1920, 1080);
             this.ctx.fillStyle = "#000";
@@ -677,7 +676,7 @@ game.initEvent = function () {
         event: {
             hover() { if(this.info.modalMode === 'score') this.canvas.style.cursor = "pointer"; },
             afterHover() { this.canvas.style.cursor = ""; },
-            click() { window.location.href = "/lk.html"; }
+            click() { window.location.href = "/playgames.html"; }
         }
     }, 1600, 720, 230, 105);
     const userList = [
@@ -886,7 +885,7 @@ game.helper = {
                         this.emotion('tanuki', 'clap', {
                             action: () => this.flash(),
                         }, 600);
-                    } else if (line.y > this.options.sushiDie && !line.dieTanuki && !line.changeTanuki) {
+                    } else if (line.yTanuki > this.options.sushiDie && !line.dieTanuki && !line.changeTanuki) {
                         line.dieTanuki = true;
                     }
                 }
@@ -912,20 +911,19 @@ game.helper = {
                 for(const line of this.info.roundMap[round]) {
                     line.y += this.info.speed;
                     if(line.y > this.options.sushiDie && !line.die && !line.change) {
-                        this.emotion(this.actualPlayer(), 'miss', null, 600);
+                        if(!line.touch) {
+                            this.emotion(this.actualPlayer(), 'miss', null, 600);
+                        }
                         line.die = true;
                     }
                 }
                 if(this.info.roundMap[round].every(item => item.change || item.die)) {
-                    if(this.info.roundMap[round].every(item => item.change)) {
+                    if(this.info.roundMap[round].filter(item => item.touch).every(item => item.change)) {
                         this.addScore(this.info.roundMap[round].length);
                         this.addScore(10 * (this.info.combo - 1));
                         this.addCombo();
                         this.emotion(this.actualPlayer(), 'greatJoy', null, 1000);
-                    } else if(
-                        (this.info.roundMap[round].length / 2) > 
-                        this.info.roundMap[round].filter(item => item.change).length
-                    ) {
+                    } else {
                         this.emotion(this.actualPlayer(), 'fear', null, 1000);
                         this.setCombo(1);
                     }
