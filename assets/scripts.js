@@ -6,7 +6,7 @@ let game = {
     canvas: null,
     info: {
         activePlayer: 'tanuki',
-        pause: false,
+        pause: true,
         speed: 4,
         miumiu: null,
         pauseTime: false,
@@ -14,9 +14,9 @@ let game = {
         score: 0,
         combo: 1,
         xCombo: 0,
-        time: 120,
+        time: null,
         userName: '',
-        modalMode: '',
+        modalMode: 'selectPlayer',
         round: 0,
         roundMap: {},
         scoreInfo: {
@@ -39,6 +39,12 @@ let game = {
                 idle: [
                     path + 'images/Bubble_1.png',
                     path + 'images/Bubble_2.png',
+                    path + 'images/personag/character1_1.png',
+                    path + 'images/personag/character1_2.png',
+                    path + 'images/personag/character2_1.png',
+                    path + 'images/personag/character2_2.png',
+                    path + 'images/personag/character3_1.png',
+                    path + 'images/personag/character3_2.png',
                 ]
             } 
         },
@@ -118,7 +124,7 @@ let game = {
         },
         bgPlayer: {
             index: 0,
-            active: 3,
+            active: 2,
             key: 'idle',
             images: {
                 idle1: [ path + 'images/bg_animation/Background_animation_1/Background_animation_1_1.png' ],
@@ -450,7 +456,7 @@ let game = {
         if(userName) {
             this.userName = userName.dataset.userName;
         }
-        this.startGame();
+        //this.startGame();
     },
     start() {
         for(const i in this.helper) {
@@ -531,30 +537,50 @@ let game = {
 
         
         const round = this.info.round;
-        
-        for(const line of this.info.roundMap[round]) {
-            const sushi = sprites.sushi.loadImg[line.key][0];
-            if(this.info.activePlayer === 'tanuki') {
-                if(!line.changeTanuki) {
-                    this.ctx.drawImage(sushi, line.x, line.yTanuki, 200, 150);
-                }
-            } else {
-                if(!line.change && !line.die) {
-                    this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
+
+        if(this.info.roundMap[round]) {
+            for(const line of this.info.roundMap[round]) {
+                let sushi = sprites.sushi.loadImg[line.key][0];
+                if(this.info.activePlayer === 'tanuki') {
+                    if(line.touch) {
+                        sushi = sprites.sushi.loadImg[line.key][1];
+                    } else {
+                        sushi = sprites.sushi.loadImg[line.key][2];
+                    }
+                    if(!line.changeTanuki) {
+                        this.ctx.drawImage(sushi, line.x, line.yTanuki, 200, 150);
+                    }
+                } else {
+                    if(!line.change && !line.die) {
+                        this.ctx.drawImage(sushi, line.x, line.y, 200, 150);
+                    }
                 }
             }
         }
+
 
         if(sprites.infoBlock.show) {
             this.ctx.drawImage(infoBlock, 620, 150, 700, 700);
         }
 
         if(this.info.modalMode) {
-            this.ctx.drawImage(sprites.modal.loadImg['idle'][0], 0, 0);
-            //this.ctx.drawImage(row2, 0, 0, 1280, 720, 640 - r1x, 360 - r1y, 1280 + r1x, 720 + r1y);
-            //this.ctx.drawImage(row1, 0, 0, 1280, 720, 640 - r1x, 360 - r1y, 1280 + r1x, 720 + r1y);
+
+            this.ctx.globalAlpha = 0.4;
+            this.ctx.fillStyle = "#181836";
+            this.ctx.fillRect(0, 0, 1920, 1080);
+            this.ctx.fillStyle = "#000";
+            this.ctx.globalAlpha = 1;
             this.ctx.fillStyle = "#fff";
+
             switch(this.info.modalMode) {
+                case "selectPlayer":
+                    this.ctx.drawImage(sprites.infoBlock.loadImg['idle'][sprites.bgPlayer.active === 2 ? 3 : 2], 50,   250, 520, 500);
+                    this.ctx.drawImage(sprites.infoBlock.loadImg['idle'][sprites.bgPlayer.active === 3 ? 5 : 4], 700,  250, 520, 500);
+                    this.ctx.drawImage(sprites.infoBlock.loadImg['idle'][sprites.bgPlayer.active === 1 ? 7 : 6], 1350, 250, 520, 500);
+                    this.ctx.drawImage(sprites.modal.loadImg['idle'][7], 780, 840, 370, 160);
+                    this.ctx.font = "4pt " + this.options.fontName;
+                    this.ctx.fillText("ВЫБРАТЬ", 965, 940);
+                break;
                 case "start":
                     this.ctx.font = "25px " + this.options.fontName;
                     this.ctx.drawImage(sprites.modal.loadImg['idle'][1], 450, 100);
@@ -642,6 +668,62 @@ let game = {
 game.initEvent = function () {
     this.eventButton({
         event: {
+            hover() { if(this.info.modalMode === 'score') this.canvas.style.cursor = "pointer"; },
+            afterHover() { this.canvas.style.cursor = "" },
+            click() { if(this.info.modalMode === 'score') this.startGame() }
+        }
+    }, 1600, 530, 230, 105);
+    this.eventButton({
+        event: {
+            hover() { if(this.info.modalMode === 'score') this.canvas.style.cursor = "pointer"; },
+            afterHover() { this.canvas.style.cursor = ""; },
+            click() { window.location.href = "/lk.html"; }
+        }
+    }, 1600, 720, 230, 105);
+    const userList = [
+        { key: 2, position: [50,   250, 520, 500] },
+        { key: 3, position: [700,  250, 520, 500] },
+        { key: 1, position: [1350, 250, 520, 500] },
+    ];
+    for(const line of userList) {
+        this.eventButton({
+            event: {
+                click() {
+                    if(this.info.modalMode === 'selectPlayer') {
+                        this.sprites.bgPlayer.active = line.key;
+                    }
+                },
+                hover() {
+                    if(this.info.modalMode === 'selectPlayer') {
+                        this.canvas.style.cursor = 'pointer';
+                    }
+                },
+                afterHover() {
+                    this.canvas.style.cursor = '';
+                },
+            }
+        }, ...line.position);
+    }
+    this.eventButton({
+        event: {
+            hover() {
+                if(this.info.modalMode === 'selectPlayer') {
+                    this.canvas.style.cursor = 'pointer';
+                }
+            },
+            click() {
+                if(this.info.modalMode === 'selectPlayer') {
+                    this.info.modalMode = '';
+                    this.startGame();
+                }
+            },
+            afterHover() {
+                this.canvas.style.cursor = '';
+            },
+        }
+    }, 780, 840, 370, 160)
+    this.eventButton({
+        event: {
             hover() {
                 //if(this.info.activePlayer !== 'tanuki') {
                     this.canvas.style.cursor = 'pointer';
@@ -689,8 +771,8 @@ game.initEvent = function () {
 game.animation = function () {
     const animationMass = [
         { key: 'tanuki',    time: 100 },
-        { key: 'bgTanuki',  time: 100 },
-        { key: 'bgPlayer',  time: 100 },
+        { key: 'bgTanuki',  time: 30 },
+        { key: 'bgPlayer',  time: 30 },
         { key: 'player1',   time: 100 },
         { key: 'player2',   time: 100 },
         { key: 'player3',   time: 100 },
@@ -733,32 +815,54 @@ game.helper = {
             }
         }, 100);
     },
+    getUniques(min, max, n){
+        n = n || 1;
+        if(n > max-min+1 || n < 0) return [];
+        var t = [];
+        for(var i = 0; i < n; ++i){
+            var a = Math.round(Math.random() * (max-min)) + min;
+            if(t[a]) --i;
+            t[a] = 1;
+        }
+        var ret = [];
+        for(i in t) ret[ret.length] = ~~i;
+        return ret;
+    },
     generateLevel() {
         this.info.pauseTime = true;
         const round = this.info.round;
         
         let countSushi = this.info.time < (120 / 2) ? 10 : 5;
+        const touchMass = this.getUniques(0, countSushi - 1, countSushi === 5 ? 2 : 5);
         if(!this.info.roundMap[round]) {
             this.info.roundMap[round] = [];
             let y = -30;
             while (countSushi) {
                 const key = Math.floor(Math.random() * (Math.floor(Object.values(this.sprites.sushi.images).length) - Math.ceil(1)) + Math.ceil(1));
-                this.info.roundMap[round].push({ 
+                const roundMapItem = { 
                     x: 850,
                     y,
                     yTanuki: y,
                     changeTanuki: false,
+                    touch: false,
                     change: false,
                     die: false,
+                    dieTanuki: false,
                     key,
                     default: {
                         y,
+                        touch: false,
                         changeTanuki: false,
+                        dieTanuki: false,
                         change: false,
                         die: false,
                     }
-                });
-
+                };
+                if(touchMass.includes(this.info.roundMap[round].length)) {
+                    roundMapItem.touch = true;
+                    roundMapItem.default.touch = true;
+                }
+                this.info.roundMap[round].push(roundMapItem);
                 y -= 150;
                 y -= (30 * key);
                 countSushi--;
@@ -774,20 +878,22 @@ game.helper = {
         this.sprites.bgTanuki.key = 'animate';
         setTimeout(() => {
             this.sprites.infoBlock.show = false;
-            const tanukiTime = setInterval(() => {
+            this.info.tanukiTime = setInterval(() => {
                 for(const line of this.info.roundMap[round]) {
                     line.yTanuki += this.info.speed;
-                    if(line.yTanuki > this.options.sushiLine && !line.changeTanuki) {
+                    if(line.yTanuki > this.options.sushiLine && !line.changeTanuki && line.touch) {
                         line.changeTanuki = true;
                         this.emotion('tanuki', 'clap', {
                             action: () => this.flash(),
                         }, 600);
+                    } else if (line.y > this.options.sushiDie && !line.dieTanuki && !line.changeTanuki) {
+                        line.dieTanuki = true;
                     }
                 }
-                if(this.info.roundMap[round].every(item => item.changeTanuki)) {
+                if(this.info.roundMap[round].every(item => item.changeTanuki || item.dieTanuki)) {
                     this.sprites.bgTanuki.index = 0;
                     this.sprites.bgTanuki.key = 'idle';
-                    clearInterval(tanukiTime);
+                    clearInterval(this.info.tanukiTime);
                     this.palayerStart();
                 }
             }, 10);
@@ -802,7 +908,7 @@ game.helper = {
         setTimeout(() => {
             this.sprites.infoBlock.show = false;
             this.info.pauseTime = false;
-            const tanukiTime = setInterval(() => {
+            this.info.tanukiTime = setInterval(() => {
                 for(const line of this.info.roundMap[round]) {
                     line.y += this.info.speed;
                     if(line.y > this.options.sushiDie && !line.die && !line.change) {
@@ -828,7 +934,7 @@ game.helper = {
 
                     //setCombo
 
-                    clearInterval(tanukiTime);
+                    clearInterval(this.info.tanukiTime);
                     this.info.round++;
                     this.sprites.bgPlayer.index = 0;
                     this.sprites.bgPlayer.key = 'idle';
@@ -865,7 +971,7 @@ game.helper = {
             const formData = new FormData();
             
             formData.append('score', this.info.score);
-            formData.append('gameType', 'game2');
+            formData.append('gameType', 'game3');
 
             try {
                 fetch('/ajax/jump.php', { method: 'POST', body: formData });
@@ -873,10 +979,28 @@ game.helper = {
                 console.error('Ошибка:', error);
             }
         }
-
     },
     formateScore: (score) => score > 9999 ? score : ('0'.repeat(4 - `${score}`.length)).concat(score),
-    startGame() { 
+    startGame() {
+        this.info.pause = false;
+        this.info.speed = 4;
+        this.info.miumiu = null;
+        this.info.pauseTime = false;
+        this.info.score = 0;
+        this.info.xCombo = 0;
+        this.info.round = 0;
+        this.info.roundMap = {};
+        this.info.time = 120;
+        this.info.score = 0;
+        this.info.combo = 1;
+        this.info.modalMode = '';
+        if(this.info.miumiu) clearInterval(this.info.miumiu);
+        this.info.miumiu = null;
+        this.sprites.ligth.alpha.value = 0;
+
+        if(this.info.tanukiTime) clearInterval(this.info.tanukiTime);
+        this.info.tanukiTime = null;
+
         this.generateLevel();
     },
     startTimer(callback = null) {
